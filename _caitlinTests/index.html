@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>INTERACTIVE CODING: THREEJS ASSIGNMENT</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel="stylesheet" href="_style/normalize.css">
+
+
+    <!-- SCRIPT
+    ------------------------------>
+    <script type="text/javascript">
+
+    </script>
+  </head>
+  <body>
+    <!-- THREE JS LIBRARY
+    ------------------------------->
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
+    <script src="js/Detector.js"></script>
+    <!-- threejs controls  -->
+    <script src="js/OrbitControls.js"></script>
+    <!-- <script src="js/FirstPersonControls.js"></script> -->
+    <!--  ^ LOOK INTO CONTROLS FOR VR???-->
+    <script src="js/KeyboardState.js"></script>
+    <script src="js/THREEx.FullScreen.js"></script>
+    <script src="js/THREEx.WindowResize.js"></script>
+
+    <!-- THREEJS DISPLAY AREA
+    ------------------------------->
+    <div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+
+
+    <!--
+    ------------------------------->
+    <script type="text/javascript">
+    // standard global variables
+    var container, scene, camera, renderer, controls;
+    var keyboard = new KeyboardState();
+    var clock = new THREE.Clock();
+
+    // custom global variables
+    var mesh;
+
+    init();
+    animate();
+
+    // ---------------
+    function init(){
+      // SCENE
+    	scene = new THREE.Scene();
+
+    	// CAMERA
+    	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+    	var VIEW_ANGLE = 70, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 200000;
+    	camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+    	scene.add(camera);
+      // have camera at center, sitting about floor
+    	camera.position.set(0,0,2000);
+      // camera.lookAt(1000,1000,0);
+    	// camera.lookAt(scene.position);
+
+      // RENDERER
+      if (Detector.webgl)
+        renderer = new THREE.WebGLRenderer({antialias:true});
+      else
+        renderer = new THREE.CanvasRenderer();
+      renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+      container = document.getElementById('ThreeJS');
+      container.appendChild(renderer.domElement);
+
+      // EVENTS
+      THREEx.WindowResize(renderer, camera);
+      THREEx.FullScreen.bindKey({charCode : 'm'.charCodeAt(0)});
+
+      // CONTROLS
+      controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+      // LIGHT
+      // is a pointlight needed for shadows???
+    	// var light = new THREE.PointLight(0xffffff);
+    	// light.position.set(0,0,0);
+    	// scene.add(light);
+      var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+      scene.add( light );
+
+      // PLANE
+      // add a texture to this, or use a solid color?
+      // if so, then pattern repeat needed
+      // var loader = new THREE.TextureLoader();
+      // var floorTexture = loader.load('images/checkerboard.jpg');
+      var planeGeometry = new THREE.PlaneGeometry(100000, 100000, 0, 0);
+      var planeMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
+      var plane = new THREE.Mesh( planeGeometry, planeMaterial );
+      // set plane into "floor" position
+      plane.position.y = -0.5;
+    	plane.rotation.x = Math.PI / 2;
+      scene.add( plane );
+
+      // SKYBOX
+      var skyBoxGeometry = new THREE.CubeGeometry(100000, 100000, 100000);
+      var skyBoxMaterial = new THREE.MeshBasicMaterial({color:0x000000, side:THREE.BackSide});
+      var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+      scene.add(skyBox);
+
+
+      // SKYBOX DOME???
+      // var geometry = new THREE.SphereGeometry( 100, 100, 100 );
+      // var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+      // var sphere = new THREE.Mesh( geometry, material );
+      // scene.add( sphere );
+
+
+    }
+
+    // animate function
+    function animate() {
+
+        requestAnimationFrame(animate);
+    	keyboard.update();
+    	if (keyboard.pressed("z")) {
+    		// do something
+    	}
+      var delta = clock.getDelta();
+    	controls.update(delta);
+    	renderer.render(scene,camera);
+    }
+    </script>
+
+  </body>
+</html>

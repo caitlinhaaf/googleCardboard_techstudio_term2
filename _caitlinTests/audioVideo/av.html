@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Three.js Sphere</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <link rel=stylesheet href="css/base.css"/>
+</head>
+<body>
+
+<script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
+<script src="js/Detector.js"></script>
+<script src="js/OrbitControls.js"></script>
+<script src="js/KeyboardState.js"></script>
+<script src="js/THREEx.FullScreen.js"></script>
+<script src="js/THREEx.WindowResize.js"></script>
+
+<div id="ThreeJS" style="position: absolute; left:0px; top:0px"></div>
+<script>
+
+// MAIN
+
+// standard global variables
+var container, scene, camera, renderer, controls;
+var keyboard = new KeyboardState();
+var clock = new THREE.Clock();
+
+// custom global variables
+var mesh;
+
+init();
+animate();
+
+// FUNCTIONS
+function init()
+{
+	// SCENE
+	scene = new THREE.Scene();
+
+	// CAMERA
+	var SCREEN_WIDTH = window.innerWidth, SCREEN_HEIGHT = window.innerHeight;
+	var VIEW_ANGLE = 70, ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT, NEAR = 0.1, FAR = 200000;
+	camera = new THREE.PerspectiveCamera(VIEW_ANGLE, ASPECT, NEAR, FAR);
+	scene.add(camera);
+	camera.position.set(0,150,400);
+	camera.lookAt(scene.position);
+
+	// RENDERER
+	if (Detector.webgl) {
+		renderer = new THREE.WebGLRenderer({antialias:true});
+	} else {
+		renderer = new THREE.CanvasRenderer();
+	}
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	container = document.getElementById('ThreeJS');
+	container.appendChild(renderer.domElement);
+
+	// EVENTS
+	THREEx.WindowResize(renderer, camera);
+	THREEx.FullScreen.bindKey({charCode : 'm'.charCodeAt(0)});
+
+	// CONTROLS
+	controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+	// LIGHT
+	var light = new THREE.PointLight("white");
+	light.position.set(100,250,100);
+	scene.add(light);
+
+	// FLOOR
+	var loader = new THREE.TextureLoader();
+	var floorTexture = loader.load('images/circuitTile.jpg');
+	floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping;
+	floorTexture.repeat.set(1000, 1000);
+	var floorMaterial = new THREE.MeshBasicMaterial({map: floorTexture, side: THREE.DoubleSide});
+	var floorGeometry = new THREE.PlaneGeometry(100000, 100000, 10, 10);
+	var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+	floor.position.y = -0.5;
+	floor.rotation.x = Math.PI / 2;
+	scene.add(floor);
+
+	//SKY
+	var skyBoxGeometry = new THREE.CubeGeometry(100000, 100000, 100000);
+	var skyBoxMaterial = new THREE.MeshBasicMaterial({color:0x9999ff, side:THREE.BackSide});
+	var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+	scene.add(skyBox);
+
+	////////////
+	// CUSTOM //
+	////////////
+
+    function AudioVisualizer() {
+    //Rendering
+    this.scene;
+    this.camera;
+    this.renderer;
+    this.controls;
+}
+
+AudioVisualizer.prototype.createspheres = function () {
+
+    for (var i = 0; i < numspheres; i++) {
+
+        var Texture = loader.load('images/milkyway.jpg');
+    	var geometry = new THREE.SphereGeometry(0.5, 0.5, 0.5);
+
+    	var material = new THREE.MeshLambertMaterial({map:Texture});
+
+    	this.sphere[i] = new THREE.Mesh(geometry, material);
+    	this.sphere[i].position.set(i-this.sphere/2,0,0);
+    	this.scene.add(this.sphere[i]);
+    };
+}
+
+AudioVisualizer.prototype.handleDrop = function () {
+    //drop
+    document.body.addEventListener("drop", function(e)
+        e.stopPropagation();
+        e.preventDefault();
+
+        //get the file
+        var file = e.dataTransfer.files[0];
+        var fileName = file.name;
+
+        $("#guide").text("Playing " + fileName);
+
+        var fileReader = new FileReader();
+
+        fileReader.onload = function(e) {
+            var fileResult = e.target.result;
+            visualizer.start(fileResult);
+        };
+
+        fileReader.onerror = function(e) {
+            debugger
+        };
+
+        fileReader.readAsArrayBuffer(file);
+    }, false);
+}
+
+
+    
+
+
+
+
+)
+}
+
+function animate() {
+
+    requestAnimationFrame(animate);
+	keyboard.update();
+	if (keyboard.pressed("z")) {
+		// do something
+	}
+
+
+
+	controls.update();
+	renderer.render(scene,camera);
+}
+
+
+</script>
+
+</body>
+</html>

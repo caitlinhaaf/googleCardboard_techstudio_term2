@@ -1,0 +1,58 @@
+<script>
+    var context;
+    var source;
+    var sourceJs;
+    var buffer;
+    var url = "music/CanIKickIt.mp3"
+    var array = new Array();
+
+    try {
+        if(typeof webkitAudioContext === 'function') {
+            context = new webkitAudioContext();
+        } else {
+            context = new AudioContext();
+        }
+    }
+    catch(e) {
+        alert ("Web Audio is not supported in this browser");
+    }
+
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
+
+    request.onload = function() {
+        context.decodeAudioData(
+            request.response,
+            function(buffer) {
+                if(!buffer) {
+                    //Error decoding file data
+                    return;
+                }
+                sourceJs = context.createJavaScriptNode(2048);
+                sourceJs.buffer = buffer;
+                sourceJs. connecet(context.destination);
+                analyser = context.createAnalyser();
+                analyser.smoothingTimeConstant = 0.6;
+                analyser.fftSize = 512;
+
+                source = context.createBufferSourcer();
+                source.buffer = buffer;
+
+                source.connect(analyser);
+                analyser.connect(sourceJs);
+                source.connect(context.destination);
+
+                sourceJs.onaudioprocess = function(e) {
+                    array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                };
+
+                source.start(0)
+            }
+            // fuction(error) {
+            //  Decoding error
+            // }
+        )
+    };
+</script>

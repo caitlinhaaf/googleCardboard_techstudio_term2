@@ -7,7 +7,7 @@
     <link rel=stylesheet href="css/base.css"/>
 </head>
 <body>
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="http://cdnjs.cloudflare.com/ajax/libs/three.js/r73/three.min.js"></script>
 <script src="js/Detector.js"></script>
 <script src="js/OrbitControls.js"></script>
@@ -89,78 +89,133 @@ function init()
 	// CUSTOM //
 	////////////
 
-    function AudioVisualizer() {
-    //Rendering
-    this.scene;
-    this.camera;
-    this.renderer;
-    this.controls;
-}
+    // Web Audio API
 
-AudioVisualizer.prototype.createspheres = function () {
+    var context;
+    var source;
+    var sourceJs;
+    var buffer;
+    var url = "music/CanIKickIt.mp3"
+    var array = new Array();
 
-    for (var i = 0; i < numspheres; i++) {
+    try {
+        if(typeof webkitAudioContext === 'function') {
+            context = new webkitAudioContext();
+        } else {
+            context = new AudioContext();
+        }
+    }
+    catch(e) {
+        alert ("Web Audio is not supported in this browser");
+    }
 
-        var Texture = loader.load('images/milkyway.jpg');
-    	var geometry = new THREE.SphereGeometry(0.5, 0.5, 0.5);
+    var request = new XMLHttpRequest();
+    request.open("GET", url, true);
+    request.responseType = "arraybuffer";
 
-    	var material = new THREE.MeshLambertMaterial({map:Texture});
+    request.onload = function() {
+        context.decodeAudioData(
+            request.response,
+            function(buffer) {
+                if(!buffer) {
+                    //Error decoding file data
+                    return;
+                }
+                sourceJs = context.createJavaScriptNode(2048);
+                sourceJs.buffer = buffer;
+                sourceJs. connecet(context.destination);
+                analyser = context.createAnalyser();
+                analyser.smoothingTimeConstant = 0.6;
+                analyser.fftSize = 512;
 
-    	this.sphere[i] = new THREE.Mesh(geometry, material);
-    	this.sphere[i].position.set(i-this.sphere/2,0,0);
-    	this.scene.add(this.sphere[i]);
+                source = context.createBufferSourcer();
+                source.buffer = buffer;
+
+                source.connect(analyser);
+                analyser.connect(sourceJs);
+                source.connect(context.destination);
+
+                sourceJs.onaudioprocess = function(e) {
+                    array = new Uint8Array(analyser.frequencyBinCount);
+                    analyser.getByteFrequencyData(array);
+                };
+
+                source.start(0)
+            }
+            // fuction(error) {
+            //  Decoding error
+            // }
+        )
     };
-}
 
-AudioVisualizer.prototype.handleDrop = function () {
-    //drop
-    document.body.addEventListener("drop", function(e)
-        e.stopPropagation();
-        e.preventDefault();
+//     function AudioVisualizer() {
+//     //Rendering
+//     this.scene;
+//     this.camera;
+//     this.renderer;
+//     this.controls;
+// }
+//
+// AudioVisualizer.prototype.createspheres = function () {
+//
+//     for (var i = 0; i < numspheres; i++) {
+//
+//         var Texture = loader.load('images/milkyway.jpg');
+//     	var geometry = new THREE.SphereGeometry(0.5, 0.5, 0.5);
+//
+//     	var material = new THREE.MeshLambertMaterial({map:Texture});
+//
+//     	this.sphere[i] = new THREE.Mesh(geometry, material);
+//     	this.sphere[i].position.set(i-this.sphere/2,0,0);
+//     	this.scene.add(this.sphere[i]);
+//     };
+// }
+//
+// AudioVisualizer.prototype.handleDrop = function () {
+//     //drop
+//     document.body.addEventListener("drop", function(e)
+//         e.stopPropagation();
+//         e.preventDefault();
+//
+//         //get the file
+//         var file = e.dataTransfer.files[0];
+//         var fileName = file.name;
+//
+//         $("#guide").text("Playing " + fileName);
+//
+//         var fileReader = new FileReader();
+//
+//         fileReader.onload = function(e) {
+//             var fileResult = e.target.result;
+//             visualizer.start(fileResult);
+//         };
+//
+//         fileReader.onerror = function(e) {
+//             debugger
+//         };
+//
+//         fileReader.readAsArrayBuffer(file);
+//     }, false);
+// }
+//
 
-        //get the file
-        var file = e.dataTransfer.files[0];
-        var fileName = file.name;
-
-        $("#guide").text("Playing " + fileName);
-
-        var fileReader = new FileReader();
-
-        fileReader.onload = function(e) {
-            var fileResult = e.target.result;
-            visualizer.start(fileResult);
-        };
-
-        fileReader.onerror = function(e) {
-            debugger
-        };
-
-        fileReader.readAsArrayBuffer(file);
-    }, false);
-}
-
-
-    
 
 
 
 
-)
-}
-
-function animate() {
-
-    requestAnimationFrame(animate);
-	keyboard.update();
-	if (keyboard.pressed("z")) {
-		// do something
-	}
 
 
 
-	controls.update();
-	renderer.render(scene,camera);
-}
+// function animate() {
+//
+//     requestAnimationFrame(animate);
+// 	keyboard.update();
+// 	if (keyboard.pressed("z")) {
+// 		// do something
+// 	}
+// 	controls.update();
+// 	renderer.render(scene,camera);
+// }
 
 
 </script>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang= "en">
+    <head>
+        <title>Web audio API Audio visualizer: frequency analyser </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>        
+    </head>
+    <body>
+        <div id='loading'>Loading Music<span id='dots'></span></div>
+        <script>
+            var context;
+            var source;
+            var sourceJs;
+            var buffer;
+            var analyser;
+            var url = "music/CanIKickIt.mp3"
+            var array = new Array();
+            var boost = 0;
+            
+            var interval = window.setInterval(function() {
+                if($('#dots').text().length < 3){
+                    $('#dots').text($('dots').text()+ '.');
+                }
+                else {$('#dots').text('');    
+                }    
+            }, 500);
+                                             
+            context = new AudioContext();
+        
+            var request = new XMLHttpRequest();
+            request.open("GET", url, true);
+            request.responseType = "arraybuffer";
+            console.log(request.onload);
+
+            function init ()
+{
+if (typeof AudioContext == "function") {
+    var audioContext = new AudioContext();
+} else if (typeof webkitAudioContext == "function") {
+    var audioContext = new webkitAudioContext();
+}
+
+var source = audioContext.createBufferSource();
+source.connect(audioContext.destination);
+
+var xhr = new XMLHttpRequest();
+xhr.open("GET", "sounds/human.mp3", true);
+xhr.responseType = "arraybuffer";
+xhr.onload = function() {
+    var buffer = audioContext.createBuffer(xhr.response, false);
+    source.buffer = buffer;
+    source.noteOn(0);
+};
+xhr.send();
+}
+                        console.log(sourceJs);
+//                        ScriptProcessorNode.connecet(context.destination);
+                        analyser = context.createAnalyser();
+                        analyser.smoothingTimeConstant = 0.6;
+                        analyser.fftSize = 512;
+
+                        source = context.createBufferSourcer();
+                        source.buffer = buffer;
+
+//                        source.connect(analyser);
+//                        analyser.connect(sourceJs);
+//                        source.connect(context.destination);
+
+                        sourceJs.onaudioprocess = function(e) {
+                            array = new Uint8Array(analyser.frequencyBinCount);
+                            analyser.getByteFrequencyData(array);
+                            boost = 0;
+                            for (var i = 0; i < array.length; i++){
+                                boost += array[i];
+                            }
+                            boost = boost / array.length;
+                        };
+                        
+                        clearInterval(interval);
+                    },
+                    function(error){
+                        $('#info').text('Decoding error:' + error);
+                    } 
+                );
+            };
+            request.onerror = function() {
+                $('#info').text('buffer: XHR error');
+            };
+            
+            request.send();
+            source.start(0);
+            console.log(array);
+        </script>
+    </body>    
+</html>   

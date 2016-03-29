@@ -35,6 +35,18 @@
             
                    
             window.addEventListener('load', onLoad, false);
+           
+            //request animation for multiple browsers
+            window.requestAnimationFrame = (function(){
+//            return window.requestAnimationFrame  ||
+//              window.webkitRequestAnimationFrame ||
+//              window.mozRequestAnimationFrame    ||
+//              window.oRequestAnimationFrame      ||
+//              window.msRequestAnimationFrame     ||
+              return function(callback){
+              window.setTimeout(callback, 1000 / 2);
+            };
+            })();
             
               //Audio Context 
             function onLoad() {
@@ -44,18 +56,42 @@
                 source = context.createMediaElementSource(audio);
                 
                 //analyser node
-                analyser = context.createAnalyser();    
-               
+                analyser = context.createAnalyser();
+                analyser.fftSize = 64;
+                 
+                console.log(analyser.fftSize);
+                console.log(analyser.frequencyBinCount);
                 
+ 
+                //create frequency array
+                freq = new Uint8Array(analyser.frequencyBinCount);
+                
+                    
+                //update analyser node    
+                function update(){
+                    //schedule the next update
+                    window.requestAnimationFrame(update);
+                      
+                    for (var i = 0; i < analyser.frequencyBinCount; i++){
+                        var value= freq[i];     
+                        analyser.getByteFrequencyData(freq);
+                        console.log(freq);
+                        console.log(analyser.Unit8Array);
+                        console.log(value);
+                    }
+                }
+                    
+ 
+                //Hook up audio routing:     
                 //connect source to anaylyser
                 source.connect(this.analyser);
-                console.log(analyser);
-                
                 //connect anaylyser to final desination node (speaker's)
                 analyser.connect(context.destination);
                 
                 audio.src = music;
                 audio.play();
+                update();
+                
             }
 
                   

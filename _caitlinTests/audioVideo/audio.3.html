@@ -18,6 +18,7 @@
             var analyser;
             var freq;
             var time;
+            var value;
             var music = document.getElementById('kickIt').src;
             
             //Create Audio Context 
@@ -73,14 +74,15 @@
                     window.requestAnimationFrame(update);
                       
                     for (var i = 0; i < analyser.frequencyBinCount; i++){
-                        var value= freq[i];     
+                        value= freq[i];     
                         analyser.getByteFrequencyData(freq);
                         console.log(freq);
-                        console.log(analyser.Unit8Array);
                         console.log(value);
                     }
                 }
-                    
+                
+                console.log(freq);
+                console.log(value);
  
                 //Hook up audio routing:     
                 //connect source to anaylyser
@@ -90,11 +92,9 @@
                 
                 audio.src = music;
                 audio.play();
-                update();
-                
+                update();         
             }
-
-                  
+             
         </script>
     </body>    
 </html>   

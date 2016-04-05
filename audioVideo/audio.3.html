@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang= "en">
+    <head>
+        <title>Web audio API Audio visualizer: frequency analyser </title>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>        
+    </head>
+    <body>
+        <audio controls>
+            <source src = 'music/CanIKickIt.mp3' id = 'kickIt' type = 'audio/mpeg'>
+            Your browser does not support the audio element.
+        </audio>
+     
+        <script>
+            
+            //variables
+            var context;
+            var source;
+            var analyser;
+            var freq;
+            var time;
+            var value;
+            var music = document.getElementById('kickIt').src;
+            
+            //Create Audio Context 
+            var contextClass = (window.AudioContext ||
+                window.webkitAudioContext ||
+                window.mozAudioContext ||
+                window.oAudioContext ||
+                window.msAudioContext);
+            if (contextClass) {
+                // Web Audio API is available.
+                var context = new contextClass();
+            } else {
+                alert('Please try a different browser')
+            }
+            
+                   
+            window.addEventListener('load', onLoad, false);
+           
+            //request animation for multiple browsers
+            window.requestAnimationFrame = (function(){
+//            return window.requestAnimationFrame  ||
+//              window.webkitRequestAnimationFrame ||
+//              window.mozRequestAnimationFrame    ||
+//              window.oRequestAnimationFrame      ||
+//              window.msRequestAnimationFrame     ||
+              return function(callback){
+              window.setTimeout(callback, 1000 / 60);
+            };
+            })();
+            
+              //Audio Context 
+            function onLoad() {
+                
+                //source node
+                var audio = new Audio();
+                source = context.createMediaElementSource(audio);
+                
+                //analyser node
+                analyser = context.createAnalyser();
+                analyser.fftSize = 64;
+                 
+                console.log(analyser.fftSize);
+                console.log(analyser.frequencyBinCount);
+                
+ 
+                //create frequency array
+              
+                    
+                //update analyser node    
+                function update(){
+                    //schedule the next update
+                    window.requestAnimationFrame(update);
+                        freq = new Uint8Array(analyser.frequencyBinCount);
+                        analyser.getByteFrequencyData(freq);    
+                    for (var i = 0; i < analyser.frequencyBinCount; i++){
+                        value= freq[i];        
+//                        console.log(freq);
+//                        console.log(value);
+                    }
+                    
+                    var freqData = new CustomEvent( 'frEvent',
+                        { 
+                            'detail': {
+                                fr: freq,
+                                v: value
+                            }
+
+                          });
+
+                    document.dispatchEvent(freqData);
+           
+                }
+                 
+                
+//                console.log(freq);
+//                console.log(value);
+                
+                document.addEventListener('frEvent',function log(e){
+                   
+                    console.log(
+//                                e.detail.fr, 
+                                e.detail.v);
+                    
+                    
+                });
+    
+                    //define new event
+              
+ 
+                //Hook up audio routing:     
+                //connect source to anaylyser
+                source.connect(this.analyser);
+                //connect anaylyser to final desination node (speaker's)
+                analyser.connect(context.destination);
+                
+                audio.src = music;
+                audio.play();
+                update();
+                
+          
+//                
+////                
+//             
+            }
+             
+        </script>
+    </body>    
+</html>   

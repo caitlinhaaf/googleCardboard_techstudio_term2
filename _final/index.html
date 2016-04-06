@@ -1,8 +1,7 @@
-
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Connecting up Google Cardboard to web APIs</title>
+    <title>Google Cardboard - Particle Effects</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
     <style>
@@ -24,10 +23,14 @@
 
     <script src="js/three.min.js"></script>
     <script src="js/StereoEffect.js"></script>
-    <script src="js/DeviceOrientationControls.js"></script>
-    <script src="js/OrbitControls.js"></script>
-    <!-- <script src="js/helvetiker_regular.typeface.js"></script> -->
-    <!-- <script src="js/timezonedb.js"></script> -->
+    <script src="js/GPUParticleSystem.js" charset="utf-8"></script>
+
+    <!-- THREE JS CONTROLS  -->
+    <script src="js/controls/DeviceOrientationControls.js"></script>
+    <script src="js/controls/OrbitControls.js"></script>
+
+    <!-- THREE JS DESKTOP CONTROLS -->
+    <!-- <script src="js/controls/TrackballControls.js"></script> -->
 
     <script>
       var scene,
@@ -37,7 +40,13 @@
           container,
           effect,
           controls,
-          clock,
+          clock = new THREE.Clock(true),
+
+          tick = 0,
+          options,
+          spawnerOptions,
+    			particleSystem,
+          effect,
 
           // Particles
           particles = new THREE.Object3D(),
@@ -46,31 +55,44 @@
           particleRotationSpeed = 0,
           particleRotationDeg = 0,
           lastColorRange = [0, 0.3],
-          currentColorRange = [0, 0.3]
-
-          // City and weather API set up
-        //   cities = [['Sydney', '2147714'], ['New York', '5128638'], ['Tokyo', '1850147'], ['London', '2643743'], ['Mexico City', '3530597'], ['Miami', '4164138'], ['San Francisco', '5391959'], ['Rome', '3169070']],
-        //   cityWeather = {},
-        //   cityTimes = [],
-        //   currentCity = 0,
-        //   currentCityText = new THREE.TextGeometry(),
-        //   currentCityTextMesh = new THREE.Mesh();
+          currentColorRange = [0, 0.3];
 
       init();
+      // animate();
 
+      //INIT FUNCTION
+      //------------------------
       function init() {
+        // CAMERA SETUP
         scene = new THREE.Scene();
         camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.001, 700);
         camera.position.set(0, 15, 0);
         scene.add(camera);
 
+        //RENDERER SETUP
         renderer = new THREE.WebGLRenderer();
+
+        // click to make fullscreen
+        // renderer.domElement.addEventListener( 'click', function () {
+				// 	if ( this.requestFullscreen ) {
+				// 		this.requestFullscreen();
+				// 	} else if ( this.msRequestFullscreen ) {
+				// 		this.msRequestFullscreen();
+				// 	} else if ( this.mozRequestFullScreen ) {
+				// 		this.mozRequestFullScreen();
+				// 	} else if ( this.webkitRequestFullscreen ) {
+				// 		this.webkitRequestFullscreen();
+				// 	}
+				// } );
+
         element = renderer.domElement;
         container = document.getElementById('webglviewer');
         container.appendChild(element);
 
+        // STEREO EFFECT
         effect = new THREE.StereoEffect(renderer);
 
+        // ORBIT CONTROLS
         // Our initial control fallback with mouse/touch events in case DeviceOrientation is not enabled
         controls = new THREE.OrbitControls(camera, element);
         controls.target.set(
@@ -80,13 +102,11 @@
         );
         controls.noPan = true;
         controls.noZoom = true;
-
         // Our preferred controls via DeviceOrientation
         function setOrientationControls(e) {
           if (!e.alpha) {
             return;
           }
-
           controls = new THREE.DeviceOrientationControls(camera, true);
           controls.connect();
           controls.update();
@@ -96,6 +116,36 @@
           window.removeEventListener('deviceorientation', setOrientationControls, true);
         }
         window.addEventListener('deviceorientation', setOrientationControls, true);
+
+
+
+        //PARTICLE SYSTEM
+				particleSystem = new THREE.GPUParticleSystem({
+					maxParticles: 2500000
+				});
+				scene.add( particleSystem);
+				// options passed during each spawned
+				options = {
+					position: new THREE.Vector3(),
+					positionRandomness: .8,
+					velocity: new THREE.Vector3(),
+					velocityRandomness: .5,
+					color: 0xaa88ff,
+					colorRandomness: .2,
+					turbulence: .5,
+					lifetime: 2,
+					size: 1,
+					sizeRandomness: 3
+				};
+				spawnerOptions = {
+					spawnRate: 15000,
+					horizontalSpeed: 1,
+					verticalSpeed: 5,
+					timeScale: 1
+				}
+
+
+
 
         // Lighting
         var light = new THREE.PointLight(0x999999, 2, 100);
@@ -146,96 +196,38 @@
         particles.position.y = 70;
         scene.add(particles);
 
-        // adjustToWeatherConditions();
-
-        clock = new THREE.Clock();
-
         animate();
       }
 
-    //   function adjustToWeatherConditions() {
-    //     var cityIDs = '';
-    //     for (var i = 0; i < cities.length; i++) {
-    //       cityIDs += cities[i][1];
-    //       if (i != cities.length - 1) cityIDs += ',';
-    //     }
-    //     getURL('http://api.openweathermap.org/data/2.5/group?id=' + cityIDs + '&APPID=b5c0b505a8746a1b2cc6b17cdab34535', function(info) {
-    //       cityWeather = info.list;
-      //
-    //       lookupTimezones(0, cityWeather.length);
-    //     });
-    //   }
 
-    //   function lookupTimezones(t, len) {
-    //     var tz = new TimeZoneDB;
-      //
-    //     tz.getJSON({
-    //         key: "GPH4A5Q6NGI1",
-    //         lat: cityWeather[t].coord.lat,
-    //         lng: cityWeather[t].coord.lon
-    //     }, function(timeZone){
-    //         cityTimes.push(new Date(timeZone.timestamp * 1000));
-      //
-    //         t++;
-    //         if (t < len) lookupTimezones(t, len);
-    //         else applyWeatherConditions();
-    //     });
-    //   }
 
-    //   function applyWeatherConditions() {
-    //     displayCurrentCityName(cities[currentCity][0]);
-      //
-    //     var info = cityWeather[currentCity];
-      //
-    //     particleRotationSpeed = info.wind.speed / 2; // dividing by 2 just to slow things down
-    //     particleRotationDeg = info.wind.deg;
-      //
-    //     var timeThere = cityTimes[currentCity] ? cityTimes[currentCity].getUTCHours() : 0,
-    //         isDay = timeThere >= 6 && timeThere <= 18;
-      //
-    //     if (isDay) {
-    //       switch (info.weather[0].main) {
-    //         case 'Clouds':
-    //           currentColorRange = [0, 0.01];
-    //           break;
-    //         case 'Rain':
-    //           currentColorRange = [0.7, 0.1];
-    //           break;
-    //         case 'Clear':
-    //         default:
-    //           currentColorRange = [0.6, 0.7];
-    //           break;
-    //       }
-    //     } else {
-    //       currentColorRange = [0.69, 0.6];
-    //     }
-      //
-    //     if (currentCity < cities.length-1) currentCity++;
-    //     else currentCity = 0;
-      //
-    //     setTimeout(applyWeatherConditions, 5000);
-    //   }
-      //
-    //   function displayCurrentCityName(name) {
-    //     scene.remove(currentCityTextMesh);
-      //
-    //     currentCityText = new THREE.TextGeometry(name, {
-    //       size: 4,
-    //       height: 1
-    //     });
-    //     currentCityTextMesh = new THREE.Mesh(currentCityText, new THREE.MeshBasicMaterial({
-    //       color: 0xffffff, opacity: 1
-    //     }));
-      //
-    //     currentCityTextMesh.position.y = 10;
-    //     currentCityTextMesh.position.z = 20;
-    //     currentCityTextMesh.rotation.x = 0;
-    //     currentCityTextMesh.rotation.y = -180;
-      //
-    //     scene.add(currentCityTextMesh);
-    //   }
-
+      // ANIMATE FUNCTION
+      //------------------------
       function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+
+        var delta = clock.getDelta() * spawnerOptions.timeScale;
+				tick += delta;
+
+				if (tick < 0) tick = 0;
+
+				if (delta > 0) {
+					options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
+					options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
+					options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
+
+					for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
+						// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
+						// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
+						particleSystem.spawnParticle(options);
+					}
+				}
+
+				particleSystem.update(tick);
+
+
+
         var elapsedSeconds = clock.getElapsedTime(),
             particleRotationDirection = particleRotationDeg <= 180 ? -1 : 1;
 
@@ -251,11 +243,16 @@
           lastColorRange = currentColorRange;
         }
 
-        requestAnimationFrame(animate);
-
         update(clock.getDelta());
         render(clock.getDelta());
+
+
       }
+
+
+
+
+
 
       function resize() {
         var width = container.offsetWidth;
@@ -274,6 +271,7 @@
         camera.updateProjectionMatrix();
 
         controls.update(dt);
+        effect.render( scene, camera );
       }
 
       function render(dt) {

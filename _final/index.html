@@ -43,9 +43,11 @@
           clock = new THREE.Clock(true),
 
           tick = 0,
-          options,
+          options1,
+          options2,
           spawnerOptions,
-    			particleSystem,
+    			particleSystem1,
+          particleSystem2,
           effect,
 
           // Particles
@@ -54,7 +56,7 @@
           maxParticleSize = 200,
           particleRotationSpeed = 0,
           particleRotationDeg = 0,
-          lastColorRange = [0, 0.3],
+          lastColorRange = [0, 5],
           currentColorRange = [0, 0.3];
 
       init();
@@ -119,15 +121,21 @@
 
 
 
-        //PARTICLE SYSTEM
-				particleSystem = new THREE.GPUParticleSystem({
-					maxParticles: 2500000
+        //PARTICLE SYSTEMS
+				particleSystem1 = new THREE.GPUParticleSystem({
+					maxParticles: 2500
 				});
-				scene.add( particleSystem);
+
+        particleSystem2 = new THREE.GPUParticleSystem({
+					maxParticles: 2500
+				});
+
+				scene.add( particleSystem1, particleSystem2);
+        //PARTICLE SYSTEM OPTIONS
 				// options passed during each spawned
 				options = {
-					position: new THREE.Vector3(),
-					positionRandomness: .8,
+					position: new THREE.Vector3(0, 200, 20),
+					positionRandomness: 20,
 					velocity: new THREE.Vector3(),
 					velocityRandomness: .5,
 					color: 0xaa88ff,
@@ -135,19 +143,34 @@
 					turbulence: .5,
 					lifetime: 2,
 					size: 1,
-					sizeRandomness: 3
+					sizeRandomness: 30
 				};
+
+        options2 = {
+					position: new THREE.Vector3(0, 400, 2),
+					positionRandomness: 10,
+					velocity: new THREE.Vector3(),
+					velocityRandomness: .5,
+					color: 0x78AB46,
+					colorRandomness: .2,
+					turbulence: .5,
+					lifetime: 2,
+					size: 1,
+					sizeRandomness: 15
+				};
+
+
 				spawnerOptions = {
 					spawnRate: 15000,
 					horizontalSpeed: 1,
 					verticalSpeed: 5,
 					timeScale: 1
-				}
+				};
 
 
 
 
-        // Lighting
+        // LIGHTING
         var light = new THREE.PointLight(0x999999, 2, 100);
         light.position.set(50, 50, 50);
         scene.add(light);
@@ -155,6 +178,10 @@
         var lightScene = new THREE.PointLight(0x999999, 2, 100);
         lightScene.position.set(0, 5, 0);
         scene.add(lightScene);
+
+
+
+
 
         // var floorTexture = THREE.ImageUtils.loadTexture('textures/wood.jpg');
         // floorTexture.wrapS = THREE.RepeatWrapping;
@@ -217,63 +244,55 @@
 					options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
 					options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
 
+          options2.position.x = Math.cos(tick * spawnerOptions.horizontalSpeed) * 10;
+					options2.position.y = Math.atan(tick * spawnerOptions.verticalSpeed) * 20;
+					options2.position.z = Math.atan(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 2;
+
 					for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
 						// Yep, that's really it.	Spawning particles is super cheap, and once you spawn them, the rest of
 						// their lifecycle is handled entirely on the GPU, driven by a time uniform updated below
-						particleSystem.spawnParticle(options);
+						particleSystem1.spawnParticle(options);
+            particleSystem2.spawnParticle(options2);
 					}
 				}
 
-				particleSystem.update(tick);
+				particleSystem1.update(tick);
+        particleSystem2.update(tick);
 
 
 
         var elapsedSeconds = clock.getElapsedTime(),
             particleRotationDirection = particleRotationDeg <= 180 ? -1 : 1;
-
         particles.rotation.y = elapsedSeconds * particleRotationSpeed * particleRotationDirection;
 
         // We check if the color range has changed, if so, we'll change the colours
         if (lastColorRange[0] != currentColorRange[0] && lastColorRange[1] != currentColorRange[1]) {
-
           for (var i = 0; i < totalParticles; i++) {
             particles.children[i].material.color.setHSL(currentColorRange[0], currentColorRange[1], (Math.random() * (0.7 - 0.2) + 0.2));
           }
-
           lastColorRange = currentColorRange;
         }
-
         update(clock.getDelta());
         render(clock.getDelta());
-
-
       }
-
-
-
 
 
 
       function resize() {
         var width = container.offsetWidth;
         var height = container.offsetHeight;
-
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
-
         renderer.setSize(width, height);
         effect.setSize(width, height);
       }
 
       function update(dt) {
         resize();
-
         camera.updateProjectionMatrix();
-
         controls.update(dt);
         effect.render( scene, camera );
       }
-
       function render(dt) {
         effect.render(scene, camera);
       }
@@ -290,23 +309,7 @@
         }
       }
 
-      function getURL(url, callback) {
-        var xmlhttp = new XMLHttpRequest();
 
-        xmlhttp.onreadystatechange = function() {
-          if (xmlhttp.readyState == 4) {
-             if (xmlhttp.status == 200){
-                 callback(JSON.parse(xmlhttp.responseText));
-             }
-             else {
-                 console.log('We had an error, status code: ', xmlhttp.status);
-             }
-          }
-        }
-
-        xmlhttp.open('GET', url, true);
-        xmlhttp.send();
-      }
     </script>
   </body>
 </html>

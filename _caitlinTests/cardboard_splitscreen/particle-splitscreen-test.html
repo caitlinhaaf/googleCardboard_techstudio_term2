@@ -36,26 +36,10 @@
 			animate();
 
 			function init() {
-
 				scene = new THREE.Scene();
-
 				camera = new THREE.PerspectiveCamera( 28, window.innerWidth / window.innerHeight, 1, 10000 );
-				// camera.position.set( 3, 2, 3 );
-				// camera.focalLength = camera.position.distanceTo( scene.position );
-				// camera.lookAt( scene.position );
-				camera.position.z = 100;
 
-				// var light = new THREE.DirectionalLight( 0x8800ff );
-				// light.position.set( - 1, 1.5, 0.5 );
-				// light.castShadow = true;
-				// light.shadow.camera.zoom = 4;
-				// scene.add( light );
-				//
-				// var light = new THREE.DirectionalLight( 0xff0000 );
-				// light.position.set( 1, 1.5, - 0.5 );
-				// light.castShadow = true;
-				// light.shadow.camera.zoom = 4;
-				// scene.add( light );
+				camera.position.z = 100;
 
 				//PARTICLE SYSTEM
 				particleSystem = new THREE.GPUParticleSystem({

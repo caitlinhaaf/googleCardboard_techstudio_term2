@@ -4,8 +4,7 @@
 
 ####Contributors: Caitlin Haaf, Jermain Joseph, Lucey Kim
 
-__bold__JS Libraries:__bold__ three.js  
-https://github.com/mrdoob/three.js/
+JS Libraries: [three.js](https://github.com/mrdoob/three.js/)
 
 All the effects/contollers etc. used were pulled from the library examples  
 https://github.com/mrdoob/three.js/tree/master/examples

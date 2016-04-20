@@ -3,8 +3,11 @@
 #### Repo: googleCardboard_techstudio_term2
 
 ####Contributors: Caitlin Haaf, Jermain Joseph, Lucey Kim
+******
 
 JS Libraries: [three.js](https://github.com/mrdoob/three.js/)
 
-All the effects/contollers etc. used were pulled from the library examples  
-https://github.com/mrdoob/three.js/tree/master/examples
+All the effects/contollers etc. used were pulled from the [three.js library examples](https://github.com/mrdoob/three.js/tree/master/examples)  
+* [Screen splitting/stero effects](https://github.com/mrdoob/three.js/blob/master/examples/webgl_effects_stereo.html)
+
+

@@ -18,7 +18,7 @@ All the effects/contollers etc. used were pulled from the [three.js library exam
   + [Device Orientation Controls](https://github.com/mrdoob/three.js/blob/master/examples/js/controls/DeviceOrientationControls.js)
   + [Orbit Controls](https://github.com/mrdoob/three.js/blob/master/examples/js/controls/OrbitControls.js)
 
-1. Firstly, in the body of our index.html document, create a div that will act as a container for our project.
+Firstly, in the body of our index.html document, create a div that will act as a container for our project.
 ```{r}
 <div id="webglviewer"></div>
 ```
@@ -36,7 +36,7 @@ body {
         top: 0;
       }	
 ```
-2. Be sure to link to all of the neccessary modules/libraries etc. (links above)
+Be sure to link to all of the neccessary modules/libraries etc. (links above)
 ```r
     <!-- EFFECTS/LIBRARIES  -->
     <script src="js/three.min.js"></script>
@@ -52,7 +52,7 @@ body {
     <script src="js/renderers/CanvasRenderer.js"></script>
 ```
 
-3. Set up the variables you will need to set up the camera, animations, particle systems, etc.
+Set up the variables you will need to set up the camera, animations, particle systems, etc.
 ```{r}
     //CAMERA/SETUP VARIABLES
     //------------------------------
@@ -87,7 +87,7 @@ body {
     
     init()
 ```
-4. The rest of the app will be run in the init function we initiated above. You will want to create a new three.js scene, camera (to be added to/positioned within the scene), renderer (to be applied to the #webglviewer div), stereo effect (to be applied to the renderer), and control schemes (to be added to the window).
+The rest of the app will be run in the init function we initiated above. You will want to create a new three.js scene, camera (to be added to/positioned within the scene), renderer (to be applied to the #webglviewer div), stereo effect (to be applied to the renderer), and control schemes (to be added to the window).
 ```r
 function init() {
         // CAMERA SETUP
@@ -132,4 +132,55 @@ function setOrientationControls(e) {
   window.removeEventListener('deviceorientation', setOrientationControls, true);
 }
 window.addEventListener('deviceorientation', setOrientationControls, true);
+```
+For the final interation of your project, you may want to use the following function which makes the scene go fullscren on the device on a click (NOTE: during development, we found it to be somewhat annoying to have the window jumping to fullscreen everytime we wanted to preview any change on desktop, so we did not implement this until the end)
+```r
+// click to make fullscreen
+renderer.domElement.addEventListener( 'click', function () {
+				if ( this.requestFullscreen ) {
+					this.requestFullscreen();
+				} else if ( this.msRequestFullscreen ) {
+					this.msRequestFullscreen();
+				} else if ( this.mozRequestFullScreen ) {
+					this.mozRequestFullScreen();
+				} else if ( this.webkitRequestFullscreen ) {
+					this.webkitRequestFullscreen();
+				}
+			} );
+```
+
+
+Now we should be ready to begin adding elements and effects to our scene.  
+We began by adding a skybox (our scene consists of a camera sitting in the middle of blue cube).
+```r
+// SKYBOX
+        //------------------------------
+        var skyBoxGeometry = new THREE.CubeGeometry(700, 700, 700);
+        var skyBoxMaterial = new THREE.MeshBasicMaterial({color:"skyblue", side:THREE.BackSide});
+        var skyBox = new THREE.Mesh(skyBoxGeometry, skyBoxMaterial);
+        scene.add(skyBox);
+```
+
+Next, we added the particle systems that animate in a mathematically generated path using the GPU Particle System. On initiation, you can define the maximum number of particles in the system, which will effect the density of particles in your system (NOTE: if your intention is to run the application on your mobile device, be aware that having a large number of maximum particles here will have a major impact on the device's processing speed. On the devices that we used, we found 2500 to be about the maximum number of particles we could use without sacrificing performance).
+```r
+particleSystem1 = new THREE.GPUParticleSystem({
+					maxParticles: 2500
+				});
+scene.add(particleSystem1);
+```
+You then want to add an options object to be applied to your particle system. This is where you can introduce a bit of customization to your particle system. You will want to set up a separate options object for each particle system you intend on adding.
+```r
+options = {
+	position: new THREE.Vector3(0, 200, 20),
+	positionRandomness: 7,
+	velocity: new THREE.Vector3(),
+	velocityRandomness: .5,
+	color: 0xFF00FF,
+	colorRandomness: .2,
+	turbulence: .5,
+	lifetime: 2,
+	size: 1,
+	sizeRandomness: 30
+};
+
 ```

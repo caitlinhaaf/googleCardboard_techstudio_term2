@@ -184,3 +184,17 @@ options = {
 };
 
 ```
+
+Now you can begin adding the system and particles to the scene.
+```r
+var material = new THREE.SpriteMaterial( {
+	map: new THREE.CanvasTexture( generateSprite() ),
+	blending: THREE.AdditiveBlending
+} );
+
+for ( var i = 0; i < 100; i++ ) {
+	particle = new THREE.Sprite( material );
+	initParticle( particle, i * 150 );
+	scene.add( particle );
+}
+```

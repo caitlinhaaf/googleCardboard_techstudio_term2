@@ -24,6 +24,8 @@
     <script src="js/three.min.js"></script>
     <script src="js/StereoEffect.js"></script>
     <script src="js/GPUParticleSystem.js" charset="utf-8"></script>
+    <script src="js/stats.min.js"></script>
+		<script src="js/tween.min.js"></script>
 
     <!-- THREE JS CONTROLS  -->
     <script src="js/controls/DeviceOrientationControls.js"></script>
@@ -32,10 +34,6 @@
     <!-- RENDERERS -->
     <script src="js/renderers/Projector.js"></script>
     <script src="js/renderers/CanvasRenderer.js"></script>
-
-    <!-- LIBS -->
-    <script src="js/stats.min.js"></script>
-		<script src="js/tween.min.js"></script>
 
     <!-- Audio file  -->
     <audio autoplay>
@@ -110,9 +108,6 @@
         // STEREO EFFECT
         //------------------------------
         effect = new THREE.StereoEffect(renderer);
-
-
-
 
         // ORBIT CONTROLS
         //------------------------------
@@ -197,16 +192,7 @@
 				};
 
 
-        // LIGHTING
-        // var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-        // scene.add( light );
-        //
-        // var light2 = new THREE.PointLight(0xffffff);
-      	// light2.position.set(100,250,100);
-      	// scene.add(light2);
-
-
-        //CENTRAL PARTICLE GENERATOR
+        // SHOOTING PARTICLES GENERATOR
         //------------------------------
         var material = new THREE.SpriteMaterial( {
 					map: new THREE.CanvasTexture( generateSprite() ),
@@ -219,18 +205,10 @@
 					scene.add( particle );
 				}
 
-        renderer = new THREE.CanvasRenderer();
-				renderer.setClearColor( 0xffffff );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				container.appendChild( renderer.domElement );
-
-				// stats = new Stats();
-				// stats.domElement.style.position = 'absolute';
-				// stats.domElement.style.top = '0px';
-				// container.appendChild( stats.domElement );
-
-
+				// renderer.setClearColor( 0xffffff );
+				// renderer.setPixelRatio( window.devicePixelRatio );
+				// renderer.setSize( window.innerWidth, window.innerHeight );
+				// container.appendChild( renderer.domElement );
 
         //SPARKLE PARTICLE SPRITE SET UP
         //------------------------------
@@ -246,13 +224,9 @@
           sprite.scale.set(15, 15, 2.0);
           sprite.position.set(
             Math.random()*-1000, Math.random()*-2000, Math.random()*500
-            //TESTING
-            // -10000,0,-10000
           );
           sprite.position.setLength(maxParticleSize * Math.random());
-
           sprite.material.blending = THREE.AdditiveBlending;
-
           particles.add(sprite);
         }
         particles.position.y = 70;
@@ -260,8 +234,6 @@
 
         animate();
       }
-
-
 
       // ANIMATE FUNCTION
       //------------------------

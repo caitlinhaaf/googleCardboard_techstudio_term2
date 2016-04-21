@@ -9,7 +9,7 @@ JS Library: [three.js](https://github.com/mrdoob/three.js/)
 
 All the effects/contollers etc. used were pulled from the [three.js library examples](https://github.com/mrdoob/three.js/tree/master/examples)  
 * Effects and Systems: 
-  + [Stero effect](https://github.com/mrdoob/three.js/blob/master/examples/webgl_effects_stereo.html) - splits the screen in half and duplicates the image.
+  + [Stereo effect](https://github.com/mrdoob/three.js/blob/master/examples/webgl_effects_stereo.html) - splits the screen in half and duplicates the image.
   + [GPU Particle System](https://github.com/mrdoob/three.js/blob/master/examples/webgl_gpu_particle_system.html) - allows for the generation/manipulation/destruction of particle systems
 * Renderers:
   + [Canvas Renderer](https://github.com/mrdoob/three.js/blob/master/examples/js/renderers/CanvasRenderer.js)
@@ -22,7 +22,7 @@ Firstly, in the body of our index.html document, create a div that will act as a
 ```{r}
 <div id="webglviewer"></div>
 ```
-Then style this div so that is takes up the entire device screen/ broswer window 
+Then style this div so that it takes up the entire device screen/ browser window 
 ```{r}
 body {
         margin: 0;
@@ -133,7 +133,7 @@ function setOrientationControls(e) {
 }
 window.addEventListener('deviceorientation', setOrientationControls, true);
 ```
-For the final interation of your project, you may want to use the following function which makes the scene go fullscren on the device on a click (NOTE: during development, we found it to be somewhat annoying to have the window jumping to fullscreen everytime we wanted to preview any change on desktop, so we did not implement this until the end)
+For the final interaction of your project, you may want to use the following function which makes the scene go fullscreen on the device on a click (NOTE: during development, we found it to be somewhat annoying to have the window jumping to fullscreen everytime we wanted to preview any change on desktop, so we did not implement this until the end)
 ```r
 // click to make fullscreen
 renderer.domElement.addEventListener( 'click', function () {
@@ -151,7 +151,7 @@ renderer.domElement.addEventListener( 'click', function () {
 
 
 Now we should be ready to begin adding elements and effects to our scene.  
-We began by adding a skybox (our scene consists of a camera sitting in the middle of blue cube).
+We began by adding a skybox (our scene consists of a camera sitting in the middle of a blue cube).
 ```r
 // SKYBOX
         //------------------------------

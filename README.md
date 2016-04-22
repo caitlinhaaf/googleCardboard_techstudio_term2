@@ -197,7 +197,7 @@ options = {
 
 ```
 
-Next, we will add our "sparkle" sprites that rotate around a center point (in this case, the camera). We first generate the sprite material, randomize their size, and then randomly distribute the across the scene.
+Next, we will add our "sparkle" sprites that rotate around a center point (in this case, the camera). We first generate the sprite material, randomize their size, and then randomly distribute them across the scene.
 ```r
 //SPARKLE PARTICLE SPRITE SET UP
 //------------------------------
@@ -221,7 +221,7 @@ for (var i = 0; i < totalParticles; i++) {
 particles.position.y = 70;
 scene.add(particles);
 ```
-Next, we will set up our "shooting" particles. Similar to the process above, we will create the sprite material along with some blending (to give it some "fuzzy" edges), and adds all of these particles to the same position within our scene (the central spot they will shoot from).
+Next, we will set up our "shooting" particles. Similar to the process above, we will create the sprite material along with some blending (to give it some "fuzzy" edges), and add all of these particles to the same position within our scene (the central spot they will shoot from).
 ```r
 // SHOOTING PARTICLES GENERATOR
 //------------------------------
@@ -259,7 +259,7 @@ return canvas;
 
 ```
 
-Then the initParticle() function (also definted outside of the init function) will take the particle and tween it to a random x,y,z coordinate (within a range) in the scene.
+Then the initParticle() function (also defined outside of the init function) will take the particle and tween it to a random x,y,z coordinate (within a range) in the scene.
 ```r
 function initParticle( particle, delay ) {
 
@@ -293,7 +293,7 @@ At the end of our init function, once all of our components have been loaded and
 animate()
 }
 ```
-Firstly, we will request the current frame, update the controls, set the scene clock delta to update our ticker
+Firstly, we will request the current frame, update the controls, set the scene clock delta to update our ticker.
 ```r
 // ANIMATE FUNCTION
 //------------------------
@@ -306,7 +306,7 @@ tick += delta;
 
 if (tick < 0) tick = 0;
 ```
-Next we will animate our particle system. This function uses the tick number and the system options (set previously) and applied a trigonometric function to manipulate the x, y, and z coordinates. We them update the particle system on each tick. This will cause the system to animate on a sort of loop. You can play with different javascript math functions here for different effects. 
+Next we will animate our particle system. This function uses the tick number and the system options (set previously) and applied a trigonometric function to manipulate the x, y, and z coordinates. We then update the particle system on each tick. This will cause the system to animate on a sort of loop. You can play with different javascript math functions here for different effects. 
 ```r
 //PARTICLE SYSTEM ANIMATIONS
 //------------------------------

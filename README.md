@@ -9,7 +9,8 @@ The Goal: To create an abstract, animated 3D portable VR experience.
 We used 3 different types of particles in our project,  that we will refer to using the following:
 * Particle system (animated grouping of particles)
 * Rotating "sparkle" sprites
-* Shooting central particles
+* Shooting central particles  
+
 ******
 
 JS Library: [three.js](https://github.com/mrdoob/three.js/)
@@ -234,3 +235,36 @@ var material = new THREE.SpriteMaterial( {
 	}
 ```
 ######ANIMATE FUNCTION
+At the end of our init function, once all of our components have been loaded and generated, we will call a function called animate which will apply the animations to our components. We'll build this function out in the following steps.
+```r
+animate()
+}
+```
+Firstly, we will request the current frame, update the controls, set the scene clock delta to update our ticker
+```r
+// ANIMATE FUNCTION
+//------------------------
+function animate() {
+requestAnimationFrame(animate);
+controls.update();
+
+var delta = clock.getDelta() * spawnerOptions.timeScale;
+tick += delta;
+
+if (tick < 0) tick = 0;
+```
+Next we will animate our particle system. This function uses the tick number and the system options (set previously) and applied a trigonometric function to manipulate the x, y, and z coordinates. We them update the particle system on each tick. This will cause the system to animate on a sort of loop. You can play with different javascript math functions here for different effects. 
+```r
+//PARTICLE SYSTEM ANIMATIONS
+//------------------------------
+if (delta > 0) {
+	options.position.x = Math.sin(tick * spawnerOptions.horizontalSpeed) * 20;
+	options.position.y = Math.sin(tick * spawnerOptions.verticalSpeed) * 10;
+	options.position.z = Math.sin(tick * spawnerOptions.horizontalSpeed + spawnerOptions.verticalSpeed) * 5;
+	
+	for (var x = 0; x < spawnerOptions.spawnRate * delta; x++) {
+		particleSystem1.spawnParticle(options);
+	}
+    }
+particleSystem1.update(tick);
+```

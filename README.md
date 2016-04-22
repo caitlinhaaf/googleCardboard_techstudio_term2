@@ -11,6 +11,8 @@ We used 3 different types of particles in our project,  that we will refer to us
 * Rotating "sparkle" sprites
 * Shooting central particles  
 
+![](_tutorialassets/splitscreen_particleview_02.png)
+
 ******
 
 JS Library: [three.js](https://github.com/mrdoob/three.js/)

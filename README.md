@@ -4,6 +4,13 @@
 
 ####Contributors: Caitlin Haaf, Jermain Joseph, Lucey Kim
 ******
+The Goal: To create an abstract, animated 3D portable VR experience.
+
+We used 3 different types of particles in our project,  that we will refer to using the following:
+* Particle system (animated grouping of particles)
+* Rotating "sparkle" sprites
+* Shooting central particles
+******
 
 JS Library: [three.js](https://github.com/mrdoob/three.js/)
 
@@ -42,6 +49,8 @@ Be sure to link to all of the neccessary modules/libraries etc. (links above)
     <script src="js/three.min.js"></script>
     <script src="js/StereoEffect.js"></script>
     <script src="js/GPUParticleSystem.js" charset="utf-8"></script>
+    <script src="js/stats.min.js"></script>
+    <script src="js/tween.min.js"></script>
 
     <!-- THREE JS CONTROLS  -->
     <script src="js/controls/DeviceOrientationControls.js"></script>
@@ -52,7 +61,7 @@ Be sure to link to all of the neccessary modules/libraries etc. (links above)
     <script src="js/renderers/CanvasRenderer.js"></script>
 ```
 
-Set up the variables you will need to set up the camera, animations, particle systems, etc.
+Set up the variables you will need to set up the camera, animations, particle systems, etc. 
 ```{r}
     //CAMERA/SETUP VARIABLES
     //------------------------------
@@ -87,7 +96,8 @@ Set up the variables you will need to set up the camera, animations, particle sy
     
     init()
 ```
-The rest of the app will be run in the init function we initiated above. You will want to create a new three.js scene, camera (to be added to/positioned within the scene), renderer (to be applied to the #webglviewer div), stereo effect (to be applied to the renderer), and control schemes (to be added to the window).
+######INIT FUNCTION
+Once we've set up our necessary variables, we run an init function to set up our scene. You will want to create a new three.js scene, camera (to be added to/positioned within the scene), renderer (to be applied to the #webglviewer div), stereo effect (to be applied to the renderer), and control schemes (to be added to the window).
 ```r
 function init() {
         // CAMERA SETUP
@@ -105,7 +115,6 @@ function init() {
 // STEREO EFFECT
 //------------------------------
 effect = new THREE.StereoEffect(renderer);
-
 
 // ORBIT CONTROLS
 //------------------------------
@@ -161,7 +170,7 @@ We began by adding a skybox (our scene consists of a camera sitting in the middl
         scene.add(skyBox);
 ```
 
-Next, we added the particle systems that animate in a mathematically generated path using the GPU Particle System. On initiation, you can define the maximum number of particles in the system, which will effect the density of particles in your system (NOTE: if your intention is to run the application on your mobile device, be aware that having a large number of maximum particles here will have a major impact on the device's processing speed. On the devices that we used, we found 2500 to be about the maximum number of particles we could use without sacrificing performance).
+Next, we added the particle system component that animates on a mathematically generated path using the GPU Particle System. On initiation, you can define the maximum number of particles in the system, which will effect the density of particles in your system (NOTE: if your intention is to run the application on your mobile device, be aware that having a large number of maximum particles here will have a major impact on the device's processing speed. On the devices that we used, we found 2500 to be about the maximum number of particles we could use without sacrificing performance).
 ```r
 particleSystem1 = new THREE.GPUParticleSystem({
 					maxParticles: 2500
@@ -185,16 +194,43 @@ options = {
 
 ```
 
-Now you can begin adding the system and particles to the scene.
+Next, we will add our "sparkle" sprites that rotate around a center point (in this case, the camera). We first generate the sprite material, randomize their size, and then randomly distribute the across the scene.
 ```r
-var material = new THREE.SpriteMaterial( {
-	map: new THREE.CanvasTexture( generateSprite() ),
-	blending: THREE.AdditiveBlending
-} );
+//SPARKLE PARTICLE SPRITE SET UP
+//------------------------------
+var particleTexture = THREE.ImageUtils.loadTexture('textures/particle4u.png'),
+    spriteMaterial = new THREE.SpriteMaterial({
+    map: particleTexture,
+    color: 0xffffff
+  });
 
-for ( var i = 0; i < 100; i++ ) {
-	particle = new THREE.Sprite( material );
-	initParticle( particle, i * 150 );
-	scene.add( particle );
+for (var i = 0; i < totalParticles; i++) {
+  var sprite = new THREE.Sprite(spriteMaterial);
+
+  sprite.scale.set(15, 15, 2.0);
+  sprite.position.set(
+    Math.random()*-1000, Math.random()*-2000, Math.random()*500
+  );
+  sprite.position.setLength(maxParticleSize * Math.random());
+  sprite.material.blending = THREE.AdditiveBlending;
+  particles.add(sprite);
 }
+particles.position.y = 70;
+scene.add(particles);
 ```
+Next, we will set up our "shooting" particles. Similar to the process above, we will create the sprite material along with some blending (to give it some "fuzzy" edges), but we will add all of these particles to the same position within our scene (the central spot they will shoot from)
+```r
+// SHOOTING PARTICLES GENERATOR
+//------------------------------
+var material = new THREE.SpriteMaterial( {
+		map: new THREE.CanvasTexture( generateSprite() ),
+		blending: THREE.AdditiveBlending
+	} );
+	
+	for ( var i = 0; i < 100; i++ ) {
+		particle = new THREE.Sprite( material );
+		initParticle( particle, i * 150 );
+		scene.add( particle );
+	}
+```
+######ANIMATE FUNCTION

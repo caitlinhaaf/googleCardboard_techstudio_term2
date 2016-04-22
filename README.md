@@ -331,3 +331,40 @@ particles.rotation.y = elapsedSeconds * particleRotationSpeed * particleRotation
 update(clock.getDelta());
 render(clock.getDelta());
 ```
+*****
+And that should be everything you need to animate your sprites and particles! At the end of our file, we've also included a couple functions to deal with resizing/updating/rendering and setting the window to fullscreen (called in the function we suggested commenting out above).
+
+```r
+function resize() {
+var width = container.offsetWidth;
+var height = container.offsetHeight;
+camera.aspect = width / height;
+camera.updateProjectionMatrix();
+renderer.setSize(width, height);
+effect.setSize(width, height);
+}
+
+function update(dt) {
+resize();
+camera.updateProjectionMatrix();
+controls.update(dt);
+effect.render( scene, camera );
+}
+function render(dt) {
+effect.render(scene, camera);
+TWEEN.update();
+			renderer.render( scene, camera );
+}
+
+function fullscreen() {
+if (container.requestFullscreen) {
+  container.requestFullscreen();
+} else if (container.msRequestFullscreen) {
+  container.msRequestFullscreen();
+} else if (container.mozRequestFullScreen) {
+  container.mozRequestFullScreen();
+} else if (container.webkitRequestFullscreen) {
+  container.webkitRequestFullscreen();
+}
+}
+```

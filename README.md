@@ -219,7 +219,7 @@ for (var i = 0; i < totalParticles; i++) {
 particles.position.y = 70;
 scene.add(particles);
 ```
-Next, we will set up our "shooting" particles. Similar to the process above, we will create the sprite material along with some blending (to give it some "fuzzy" edges), but we will add all of these particles to the same position within our scene (the central spot they will shoot from)
+Next, we will set up our "shooting" particles. Similar to the process above, we will create the sprite material along with some blending (to give it some "fuzzy" edges), and adds all of these particles to the same position within our scene (the central spot they will shoot from).
 ```r
 // SHOOTING PARTICLES GENERATOR
 //------------------------------
@@ -234,8 +234,59 @@ var material = new THREE.SpriteMaterial( {
 		scene.add( particle );
 	}
 ```
+This references a generateSprite function (defined outside of the init function). This is where you can manipulate the colour and size of these sprites.
+```r
+function generateSprite() {
+
+var canvas = document.createElement( 'canvas' );
+canvas.width = 16;
+canvas.height = 16;
+
+var context = canvas.getContext( '2d' );
+var gradient = context.createRadialGradient( canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width / 2 );
+gradient.addColorStop( 0, 'rgba(255,255,255,1)' );
+gradient.addColorStop( 0.2, 'rgba(0,255,255,1)' );
+gradient.addColorStop( 0.4, 'rgba(0,0,64,1)' );
+gradient.addColorStop( 1, 'rgba(0,0,0,1)' );
+
+context.fillStyle = gradient;
+context.fillRect( 0, 0, canvas.width, canvas.height );
+
+return canvas;
+}
+
+```
+
+Then the initParticle() function (also definted outside of the init function) will take the particle and tween it to a random x,y,z coordinate (within a range) in the scene.
+```r
+function initParticle( particle, delay ) {
+
+	var particle = this instanceof THREE.Sprite ? this : particle;
+	var delay = delay !== undefined ? delay : 0;
+
+	particle.position.set( 0, -100, 0 );
+	particle.scale.x = particle.scale.y = Math.random() * 32 + 12;
+
+	new TWEEN.Tween( particle )
+		.delay( delay )
+		.to( {}, 10000 )
+		.onComplete( initParticle )
+		.start();
+
+	new TWEEN.Tween( particle.position )
+		.delay( delay )
+		.to( { x: Math.random() * 4000 - 2000, y: Math.random() * 4000 - 500, z: Math.random() * 4000 - 2000 }, 10000 )
+		.start();
+
+	new TWEEN.Tween( particle.scale )
+		.delay( delay )
+		.to( { x: 0.01, y: 0.01 }, 10000 )
+		.start();
+
+}
+```
 ######ANIMATE FUNCTION
-At the end of our init function, once all of our components have been loaded and generated, we will call a function called animate which will apply the animations to our components. We'll build this function out in the following steps.
+At the end of our init function, once all of our components have been loaded and generated, we will call a function called animate which will apply the animations to our particle system and radial rotation sprite components. We'll build this function out in the following steps.
 ```r
 animate()
 }
@@ -267,4 +318,16 @@ if (delta > 0) {
 	}
     }
 particleSystem1.update(tick);
+```
+Next, we will animate our rotating "sparkle" sprites. In this example, we used the elapsed time to rotate the sprite around the y-axis 180 degrees, at which point it resets, so the sprites are animating from -180 degrees to 0, and so on.
+
+```r
+//SPARKLE PARTICLE ANIMATIONS
+//------------------------------
+var elapsedSeconds = clock.getElapsedTime(),
+particleRotationDirection = particleRotationDeg <= 180 ? -1 : 1;
+particles.rotation.y = elapsedSeconds * particleRotationSpeed * particleRotationDirection;
+
+update(clock.getDelta());
+render(clock.getDelta());
 ```

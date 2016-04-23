@@ -269,14 +269,16 @@
         particleSystem2.update(tick);
 
 
-
+        //SPARKLE PARTICLE ANIMATIONS
+        //------------------------------
         var elapsedSeconds = clock.getElapsedTime(),
-            particleRotationDirection = particleRotationDeg <= 180 ? -1 : 1;
+        particleRotationDirection = particleRotationDeg <= 180 ? -1 : 1;
         particles.rotation.y = elapsedSeconds * particleRotationSpeed * particleRotationDirection;
 
         update(clock.getDelta());
         render(clock.getDelta());
       }
+
 
 
       function initParticle( particle, delay ) {
@@ -326,9 +328,6 @@
 
       }
 
-
-
-
       function resize() {
         var width = container.offsetWidth;
         var height = container.offsetHeight;
@@ -346,13 +345,8 @@
       }
       function render(dt) {
         effect.render(scene, camera);
-
         TWEEN.update();
-
 				renderer.render( scene, camera );
-
-
-
       }
 
       function fullscreen() {
